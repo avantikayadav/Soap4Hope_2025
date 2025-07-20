@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Soap4Hope Pledge Certificate Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0fdfb;
+      padding: 30px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px 40px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h3 {
+      color: #007c7a;
+      text-align: center;
+    }
+    label, input, button {
+      display: block;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #00b3a4;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #007c7a;
+    }
+    .pledge-content {
+      background-color: #e6f7f7;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-left: 5px solid #00b3a4;
+    }
+    .pledge-content ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Take the Soap4Hope Pledge</h1>
+
+    <div class="pledge-content">
+      <h3>Soap4Hope Pledge for Hygiene Equity & Zero Soap Waste</h3>
+      <p><strong>I pledge to stand with Soap4Hope</strong> in the global mission to ensure that no bar of soap is wasted and no child is left behind in the fight for basic hygiene.</p>
+      <p><strong>I commit to:</strong></p>
+      <ul>
+        <li>✅ Supporting sustainable practices that reduce soap waste.</li>
+        <li>✅ Raising awareness about hygiene poverty and its impact.</li>
+        <li>✅ Encouraging hotels, schools, and communities to donate, recycle, and reuse.</li>
+        <li>✅ Empowering youth to lead changemaking actions through innovation.</li>
+        <li>✅ Helping create and distribute hygiene kits to underserved populations.</li>
+      </ul>
+      <p><em>Together, we will turn waste into wellness, privilege into purpose, and soap into hope—one bar at a time.</em></p>
+    </div>
+
+    <form id="pledgeForm">
+      <label for="name">Your Full Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <input type="checkbox" id="agree" name="agree" required>
+      <label for="agree">I have read and agree to the Soap4Hope Pledge.</label>
+
+      <button type="submit">Generate & Download Certificate</button>
+    </form>
+  </div>
+
+  <script>
+    async function generateCertificate(name) {
+      const pdfUrl = "https://raw.githubusercontent.com/avantikayadav/Soap4Hope_2025/main/Soap4Hope_Certificate.pdf";
+
+      const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+      const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
+      const pages = pdfDoc.getPages();
+      const firstPage = pages[0];
+
+      const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+      const { width, height } = firstPage.getSize();
+
+      // Adjusted placement: centered between top butterflies
+      firstPage.drawText(name, {
+        x: width / 2 - (name.length * 10), // horizontal centering
+        y: 400, // vertical position (adjust as needed)
+        size: 24,
+        font: helveticaFont,
+        color: PDFLib.rgb(0, 0, 0) // solid black
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Soap4Hope_Certificate_${name}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    document.getElementById("pledgeForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const agreed = document.getElementById("agree").checked;
+
+      if (name && agreed) {
+        generateCertificate(name);
+        alert("Thank you for pledging! Your certificate is downloading.");
+      } else {
+        alert("Please enter your name and accept the pledge.");
+      }
+    });
+  </script>
+</body>
+</html>
